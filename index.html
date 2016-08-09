@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Page Title</title>
+<script type="text/javascript">
+
+function Piece(color,xlocation, ylocation)
+{
+   this.color=color;
+   this.xlocation=xlocation;
+   this.ylocation=ylocation;
+}
+
+checker_1 = new Piece("white", 2, 2);
+document.write("Piece is " + checker_1.color + " at (" + checker_1.xlocation + ", " + checker_1.ylocation + ").");
+
+var Board =
+{
+    metal: "Titanium",
+    killAllHumans: function()
+    {
+        alert("Exterminate!");
+    }
+};
+
+</script> 
+
+</head>
+<body>
+
+<h1>Checkers!</h1>
+<p>Board.</p>
+<img src="./test.png"></img>
+
+</body>
+</html>
