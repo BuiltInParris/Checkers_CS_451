@@ -6,7 +6,8 @@ var serverUrl = "127.0.0.1";
 
 var http = require("http");
 var path = require("path"); 
-var fs = require("fs"); 		
+var fs = require("fs");
+var url = require("url");
 
 console.log("Starting web server at " + serverUrl + ":" + port);
 
@@ -14,7 +15,12 @@ http.createServer( function(req, res) {
 
 	var now = new Date();
 
-	var filename = "index.html";
+	var request = url.parse(req.url, true);
+	var filename = request.pathname;
+	if(filename == "/")
+	{
+		filename = "/index.html";
+	}
 	console.log(filename);
 	var ext = path.extname(filename);
 	var localPath = __dirname;
@@ -27,12 +33,12 @@ http.createServer( function(req, res) {
 		".gif": "image/gif",
 		".png": "image/png"
 	};
-	//console.log(validExtensions[ext]);
+
 	var isValidExt = validExtensions[ext];
 
 	if (isValidExt) {
 		
-		localPath += "/" + filename;
+		localPath += filename;
 		fs.exists(localPath, function(exists) {
 			if(exists) {
 				console.log("Serving file: " + localPath);
