@@ -9,6 +9,19 @@ var path = require("path");
 var fs = require("fs");
 var url = require("url");
 
+
+var validExtensions = {
+		".html" : "text/html",			
+		".js": "application/javascript", 
+		".css": "text/css",
+		".txt": "text/plain",
+		".jpg": "image/jpeg",
+		".gif": "image/gif",
+		".png": "image/png",
+		".ico": "image/x-icon"
+
+};
+
 console.log("Starting web server at " + serverUrl + ":" + port);
 
 http.createServer( function(req, res) {
@@ -24,15 +37,6 @@ http.createServer( function(req, res) {
 	console.log(filename);
 	var ext = path.extname(filename);
 	var localPath = __dirname;
-	var validExtensions = {
-		".html" : "text/html",			
-		".js": "application/javascript", 
-		".css": "text/css",
-		".txt": "text/plain",
-		".jpg": "image/jpeg",
-		".gif": "image/gif",
-		".png": "image/png"
-	};
 
 	var isValidExt = validExtensions[ext];
 
@@ -60,7 +64,7 @@ function getFile(localPath, res, mimeType) {
 	fs.readFile(localPath, function(err, contents) {
 		if(!err) {
 			res.setHeader("Content-Length", contents.length);
-			res.setHeader("Content-Type", mimeType);
+			res.setHeader("Content-Type", validExtensions[mimeType]);
 			res.statusCode = 200;
 			res.end(contents);
 		} else {
