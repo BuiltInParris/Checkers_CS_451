@@ -5,7 +5,7 @@
 <link rel="stylesheet" type="text/css" href="style.css">
 <script src="jquery-3.1.0.min.js"></script>
 <script type="text/javascript">
-//$( document ).ready(function() {
+$( document ).ready(function() {
 
 function Piece(color,xlocation, ylocation)
 {
@@ -15,7 +15,7 @@ function Piece(color,xlocation, ylocation)
 }
 
 checker_1 = new Piece("white", 2, 2);
-document.write("Piece is " + checker_1.color + " at (" + checker_1.xlocation + ", " + checker_1.ylocation + ").");
+//document.write("Piece is " + checker_1.color + " at (" + checker_1.xlocation + ", " + checker_1.ylocation + ").");
 
 var Board =
 {
@@ -25,8 +25,19 @@ var Board =
         alert("Exterminate!");
     }
 };
-//console.log($('#22'));//.attr("src","black_checker.png");;
-//});
+
+function ModifySpace(x, y)
+{
+    var className = ".column" + x + ".row" + y;
+    $(className).attr("src","white_checker.png");
+}
+
+ModifySpace(2, 2);
+
+ModifySpace(4, 2);
+
+
+});
 </script> 
 
 </head>
@@ -37,7 +48,7 @@ var Board =
 <table>
     <tr>
         <td class="black">
-            <img id="22" class="content row1 column1" src="white_checker.png"></img>
+            <img id="mydivid" class="content row1 column1"></img>
         </td>
         <td class="white">
             <img class="content row1 column2"></img>
