@@ -4,7 +4,19 @@
 <title>Page Title</title>
 <link rel="stylesheet" type="text/css" href="style.css">
 <script src="jquery-3.1.0.min.js"></script>
+<script src="/node_modules/socket.io-client/socket.io.js"></script>
 <script type="text/javascript">
+var socket = io.connect();
+
+var board = [[1, 0, 1, 0, 1, 0, 1, 0], 
+             [0, 1, 0, 1, 0, 1, 0, 1], 
+             [1, 0, 1, 0, 1, 0, 1, 0], 
+             [0, 0, 0, 0, 0, 0, 0, 0], 
+             [0, 0, 0, 0, 0, 0, 0, 0], 
+             [0, 2, 0, 2, 0, 2, 0, 2], 
+             [2, 0, 2, 0, 2, 0, 2, 0], 
+             [0, 2, 0, 2, 0, 2, 0, 2]];
+
 $( document ).ready(function() {
 
 function Piece(color,xlocation, ylocation)
@@ -16,18 +28,42 @@ function Piece(color,xlocation, ylocation)
 
 checker_1 = new Piece("white", 2, 2);
 
-function ModifySpace(x, y)
+socket.on('board', function(new_board){
+    for(i=0; i < new_board.length; i++)
+    {
+        row = new_board[i];
+        for(j=0; j < row.length; j++)
+        {
+            type_num = row[j];
+            ModifySpace(j+1, i+1, type_num);
+        }
+    }
+  });
+
+function ModifySpace(x, y, i)
 {
     var className = ".column" + x + ".row" + y;
-    $(className).attr("src","white_checker.png");
+    if(i == 0)
+    {
+        $(className).attr("src","");
+    } else if(i == 1)
+    {
+        $(className).attr("src","white_checker.png");
+    } else if(i == 2) {
+        $(className).attr("src","black_checker.png");
+    }
 }
 
-ModifySpace(2, 2);
+//ModifySpace(2, 2);
 
-ModifySpace(4, 2);
-
+//ModifySpace(4, 2);
 
 });
+
+function SendBoard()
+{
+    socket.emit('move', board);
+}
 </script> 
 
 </head>
@@ -35,6 +71,7 @@ ModifySpace(4, 2);
 
 <h1>Checkers!</h1>
 <p>Board.</p>
+<button onclick="SendBoard()">Initialize Board</button>
 <table>
     <tr>
         <td class="black">
