@@ -2,7 +2,22 @@
 <html>
 <head>
 <title>Page Title</title>
+<link rel="stylesheet" type="text/css" href="style.css">
+<script src="jquery-3.1.0.min.js"></script>
+<script src="/node_modules/socket.io-client/socket.io.js"></script>
 <script type="text/javascript">
+var socket = io.connect();
+
+var board = [[1, 0, 1, 0, 1, 0, 1, 0], 
+             [0, 1, 0, 1, 0, 1, 0, 1], 
+             [1, 0, 1, 0, 1, 0, 1, 0], 
+             [0, 0, 0, 0, 0, 0, 0, 0], 
+             [0, 0, 0, 0, 0, 0, 0, 0], 
+             [0, 2, 0, 2, 0, 2, 0, 2], 
+             [2, 0, 2, 0, 2, 0, 2, 0], 
+             [0, 2, 0, 2, 0, 2, 0, 2]];
+
+$( document ).ready(function() {
 
 function Piece(color,xlocation, ylocation)
 {
@@ -12,17 +27,47 @@ function Piece(color,xlocation, ylocation)
 }
 
 checker_1 = new Piece("white", 2, 2);
+<<<<<<< HEAD
 document.write("Piece is: " + checker_1.color + " at (" + checker_1.xlocation + ", " + checker_1.ylocation + ").");
+=======
+>>>>>>> refs/remotes/origin/master
 
-var Board =
-{
-    metal: "Titanium",
-    killAllHumans: function()
+socket.on('board', function(new_board){
+    for(i=0; i < new_board.length; i++)
     {
-        alert("Exterminate!");
+        row = new_board[i];
+        for(j=0; j < row.length; j++)
+        {
+            type_num = row[j];
+            ModifySpace(j+1, i+1, type_num);
+        }
     }
-};
+  });
 
+function ModifySpace(x, y, i)
+{
+    var className = ".column" + x + ".row" + y;
+    if(i == 0)
+    {
+        $(className).attr("src","");
+    } else if(i == 1)
+    {
+        $(className).attr("src","white_checker.png");
+    } else if(i == 2) {
+        $(className).attr("src","black_checker.png");
+    }
+}
+
+//ModifySpace(2, 2);
+
+//ModifySpace(4, 2);
+
+});
+
+function SendBoard()
+{
+    socket.emit('move', board);
+}
 </script> 
 
 </head>
@@ -30,7 +75,217 @@ var Board =
 
 <h1>Checkers!</h1>
 <p>Board.</p>
-<img src="./test.png"></img>
+<button onclick="SendBoard()">Initialize Board</button>
+<table>
+    <tr>
+        <td class="black">
+            <img id="mydivid" class="content row1 column1"></img>
+        </td>
+        <td class="white">
+            <img class="content row1 column2"></img>
+        </td>
+        <td class="black">
+            <img class="content row1 column3"></img>
+        </td>
+        <td class="white">
+            <img class="content row1 column4"></img>
+        </td>
+        <td class="black">
+            <img class="content row1 column5"></img>
+        </td>
+        <td class="white">
+            <img class="content row1 column6"></img>
+        </td>
+        <td class="black">
+            <img class="content row1 column7"></img>
+        </td>
+        <td class="white">
+            <img class="content row1 column 8"></img>
+        </td>
+    </tr>
+    <tr>
+        <td class="white">
+            <img class="content row2 column1"></img>
+        </td>
+        <td class="black">
+            <img class="content row2 column2"></img>
+        </td>
+        <td class="white">
+            <img class="content row2 column3"></img>
+        </td>
+        <td class="black">
+            <img class="content row2 column4"></img>
+        </td>
+        <td class="white">
+            <img class="content row2 column5"></img>
+        </td>
+        <td class="black">
+            <img class="content row2 column6"></img>
+        </td>
+        <td class="white">
+            <img class="content row2 column7"></img>
+        </td>
+        <td class="black">
+            <img class="content row2 column8"></img>
+        </td>
+    </tr>
+    <tr>
+        <td class="black">
+            <img class="content row3 column1"></img>
+        </td>
+        <td class="white">
+            <img class="content row3 column2"></img>
+        </td>
+        <td class="black">
+            <img class="content row3 column3"></img>
+        </td>
+        <td class="white">
+            <img class="content row3 column4"></img>
+        </td>
+        <td class="black">
+            <img class="content row3 column5"></img>
+        </td>
+        <td class="white">
+            <img class="content row3 column6"></img>
+        </td>
+        <td class="black">
+            <img class="content row3 column7"></img>
+        </td>
+        <td class="white">
+            <img class="content row3 column 8"></img>
+        </td>
+    </tr>
+    <tr>
+        <td class="white">
+            <img class="content row4 column1"></img>
+        </td>
+        <td class="black">
+            <img class="content row4 column2"></img>
+        </td>
+        <td class="white">
+            <img class="content row4 column3"></img>
+        </td>
+        <td class="black">
+            <img class="content row4 column4"></img>
+        </td>
+        <td class="white">
+            <img class="content row4 column5"></img>
+        </td>
+        <td class="black">
+            <img class="content row4 column6"></img>
+        </td>
+        <td class="white">
+            <img class="content row4 column7"></img>
+        </td>
+        <td class="black">
+            <img class="content row4 column8"></img>
+        </td>
+    </tr>
+    <tr>
+        <td class="black">
+            <img class="content row5 column1"></img>
+        </td>
+        <td class="white">
+            <img class="content row5 column2"></img>
+        </td>
+        <td class="black">
+            <img class="content row5 column3"></img>
+        </td>
+        <td class="white">
+            <img class="content row5 column4"></img>
+        </td>
+        <td class="black">
+            <img class="content row5 column5"></img>
+        </td>
+        <td class="white">
+            <img class="content row5 column6"></img>
+        </td>
+        <td class="black">
+            <img class="content row5 column7"></img>
+        </td>
+        <td class="white">
+            <img class="content row5 column 8"></img>
+        </td>
+    </tr>
+    <tr>
+        <td class="white">
+            <img class="content row6 column1"></img>
+        </td>
+        <td class="black">
+            <img class="content row6 column2"></img>
+        </td>
+        <td class="white">
+            <img class="content row6 column3"></img>
+        </td>
+        <td class="black">
+            <img class="content row6 column4"></img>
+        </td>
+        <td class="white">
+            <img class="content row6 column5"></img>
+        </td>
+        <td class="black">
+            <img class="content row6 column6"></img>
+        </td>
+        <td class="white">
+            <img class="content row6 column7"></img>
+        </td>
+        <td class="black">
+            <img class="content row6 column8"></img>
+        </td>
+    </tr>
+    <tr>
+        <td class="black">
+            <img class="content row7 column1"></img>
+        </td>
+        <td class="white">
+            <img class="content row7 column2"></img>
+        </td>
+        <td class="black">
+            <img class="content row7 column3"></img>
+        </td>
+        <td class="white">
+            <img class="content row7 column4"></img>
+        </td>
+        <td class="black">
+            <img class="content row7 column5"></img>
+        </td>
+        <td class="white">
+            <img class="content row7 column6"></img>
+        </td>
+        <td class="black">
+            <img class="content row7 column7"></img>
+        </td>
+        <td class="white">
+            <img class="content row7 column 8"></img>
+        </td>
+    </tr>
+    <tr>
+        <td class="white">
+            <img class="content row8 column1"></img>
+        </td>
+        <td class="black">
+            <img class="content row8 column2"></img>
+        </td>
+        <td class="white">
+            <img class="content row8 column3"></img>
+        </td>
+        <td class="black">
+            <img class="content row8 column4"></img>
+        </td>
+        <td class="white">
+            <img class="content row8 column5"></img>
+        </td>
+        <td class="black">
+            <img class="content row8 column6"></img>
+        </td>
+        <td class="white">
+            <img class="content row8 column7"></img>
+        </td>
+        <td class="black">
+            <img class="content row8 column8"></img>
+        </td>
+    </tr>
+    <table>
 
 </body>
 </html>
