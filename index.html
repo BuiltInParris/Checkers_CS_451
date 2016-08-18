@@ -6,64 +6,74 @@
 <script src="jquery-3.1.0.min.js"></script>
 <script src="/node_modules/socket.io-client/socket.io.js"></script>
 <script type="text/javascript">
-var socket = io.connect();
+    var socket = io.connect();
 
-var board = [[1, 0, 1, 0, 1, 0, 1, 0], 
-             [0, 1, 0, 1, 0, 1, 0, 1], 
-             [1, 0, 1, 0, 1, 0, 1, 0], 
-             [0, 0, 0, 0, 0, 0, 0, 0], 
-             [0, 0, 0, 0, 0, 0, 0, 0], 
-             [0, 2, 0, 2, 0, 2, 0, 2], 
-             [2, 0, 2, 0, 2, 0, 2, 0], 
-             [0, 2, 0, 2, 0, 2, 0, 2]];
+    var board = [[1, 0, 1, 0, 1, 0, 1, 0], 
+                 [0, 1, 0, 1, 0, 1, 0, 1], 
+                 [1, 0, 1, 0, 1, 0, 1, 0], 
+                 [0, 0, 0, 0, 0, 0, 0, 0], 
+                 [0, 0, 0, 0, 0, 0, 0, 0], 
+                 [0, 2, 0, 2, 0, 2, 0, 2], 
+                 [2, 0, 2, 0, 2, 0, 2, 0], 
+                 [0, 2, 0, 2, 0, 2, 0, 2]];
 
-$( document ).ready(function() {
+    $( document ).ready(function() {
 
-function Piece(color,xlocation, ylocation)
-{
-   this.color=color;
-   this.xlocation=xlocation;
-   this.ylocation=ylocation;
-}
-
-checker_1 = new Piece("white", 2, 2);
-
-socket.on('board', function(new_board){
-    for(i=0; i < new_board.length; i++)
-    {
-        row = new_board[i];
-        for(j=0; j < row.length; j++)
+        function Piece(color,xlocation, ylocation)
         {
-            type_num = row[j];
-            ModifySpace(j+1, i+1, type_num);
+           this.color=color;
+           this.xlocation=xlocation;
+           this.ylocation=ylocation;
         }
-    }
-  });
 
-function ModifySpace(x, y, i)
-{
-    var className = ".column" + x + ".row" + y;
-    if(i == 0)
+        checker_1 = new Piece("white", 2, 2);
+
+        socket.on('board', function(new_board){
+            mirrorBoard(new_board);
+        });
+
+        socket.on('disconnect', function(){
+            alert("Disconnected!");
+        });
+
+        function mirrorBoard(new_board){
+            for(i=0; i < new_board.length; i++)
+            {
+                row = new_board[i];
+                for(j=0; j < row.length; j++)
+                {
+                    type_num = row[j];
+                    ModifySpace(j+1, i+1, type_num);
+                }
+            }
+        }
+
+        $( ".black" ).click(function() {
+            //if()
+            console.log($(this).find("img").attr('src'));
+        });
+
+        function ModifySpace(x, y, i)
+        {
+            var className = ".column" + x + ".row" + y;
+            if(i == 0)
+            {
+                $(className).attr("src","");
+            } else if(i == 1)
+            {
+                $(className).attr("src","white_checker.png");
+            } else if(i == 2) {
+                $(className).attr("src","black_checker.png");
+            }
+        }
+
+        mirrorBoard(board);
+    });
+
+    function SendBoard()
     {
-        $(className).attr("src","");
-    } else if(i == 1)
-    {
-        $(className).attr("src","white_checker.png");
-    } else if(i == 2) {
-        $(className).attr("src","black_checker.png");
+        socket.emit('move', board);
     }
-}
-
-//ModifySpace(2, 2);
-
-//ModifySpace(4, 2);
-
-});
-
-function SendBoard()
-{
-    socket.emit('move', board);
-}
 </script> 
 
 </head>
