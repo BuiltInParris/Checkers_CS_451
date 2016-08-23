@@ -5,75 +5,7 @@
 <link rel="stylesheet" type="text/css" href="style.css">
 <script src="jquery-3.1.0.min.js"></script>
 <script src="/node_modules/socket.io-client/socket.io.js"></script>
-<<<<<<< HEAD
-<script type="text/javascript">
-var socket = io.connect();
-
-var board = [[1, 0, 1, 0, 1, 0, 1, 0], 
-             [0, 1, 0, 1, 0, 1, 0, 1], 
-             [1, 0, 1, 0, 1, 0, 1, 0], 
-             [0, 0, 0, 0, 0, 0, 0, 0], 
-             [0, 0, 0, 0, 0, 0, 0, 0], 
-             [0, 2, 0, 2, 0, 2, 0, 2], 
-             [2, 0, 2, 0, 2, 0, 2, 0], 
-             [0, 2, 0, 2, 0, 2, 0, 2]];
-
-$( document ).ready(function() {
-
-function Piece(color,xlocation, ylocation)
-{
-   this.color=color;
-   this.xlocation=xlocation;
-   this.ylocation=ylocation;
-}
-
-checker_1 = new Piece("white", 2, 2);
-<<<<<<< HEAD
-document.write("Piece is: " + checker_1.color + " at (" + checker_1.xlocation + ", " + checker_1.ylocation + ").");
-=======
->>>>>>> refs/remotes/origin/master
-
-socket.on('board', function(new_board){
-    for(i=0; i < new_board.length; i++)
-    {
-        row = new_board[i];
-        for(j=0; j < row.length; j++)
-        {
-            type_num = row[j];
-            ModifySpace(j+1, i+1, type_num);
-        }
-    }
-  });
-
-function ModifySpace(x, y, i)
-{
-    var className = ".column" + x + ".row" + y;
-    if(i == 0)
-    {
-        $(className).attr("src","");
-    } else if(i == 1)
-    {
-        $(className).attr("src","white_checker.png");
-    } else if(i == 2) {
-        $(className).attr("src","black_checker.png");
-    }
-}
-
-//ModifySpace(2, 2);
-
-//ModifySpace(4, 2);
-
-});
-
-function SendBoard()
-{
-    socket.emit('move', board);
-}
-</script> 
-
-=======
 <script type="text/javascript" src="Logic.js"></script> 
->>>>>>> refs/remotes/origin/master
 </head>
 <body>
 

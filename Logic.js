@@ -30,7 +30,15 @@
                 ModifySpace(xNewLocation, yNewLocation, pieceColor);
             }
         }
+		
+		/*Valid Move Black
+		function checkMoveValid(xOldLocation, yOldlocation, xNewLocation, yNewLocatoin)
+		{
+			if((xOldLocation - xNewLocation) <= 1
+		
+		*/
 
+		//This is how king moves work
         function checkMoveValid(xOldLocation, yOldLocation, xNewLocation, yNewLocation)
         {
             //console.log("checking.");
@@ -76,7 +84,8 @@
                 }
             }
         }
-
+		
+		//Click on a black square
         $( ".black" ).click(function() {
             if(oldChecker != null)
             {

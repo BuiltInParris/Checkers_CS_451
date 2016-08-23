@@ -24,8 +24,10 @@ var validExtensions = {
 };
 
 var numPlayers = 0;
-
-
+var players = [];
+function player(id, color) {
+    
+}
 var server = http.createServer( function(req, res) {
 	
 	var now = new Date();
@@ -35,7 +37,27 @@ var server = http.createServer( function(req, res) {
 
 	if(filename == "/")
 	{
-		filename = "/index.html";
+		filename = "/home.html";
+	}
+
+	if(filename == "/Home")
+	{
+		filename = "/home.html";
+	}
+
+	if(filename == "/NewGame")
+	{
+		filename = "/newGame.html";
+	}
+
+	if(filename == "/About")
+	{
+		filename = "/about.html";
+	}
+
+	if(filename == "/Instructions")
+	{
+		filename = "/instructions.html";
 	}
 
 	if(filename != "/socket.io/")
@@ -76,8 +98,8 @@ server.listen(port, function() {
 var socket = io.listen(server); 
 
 socket.on('connection', function(client){
-  console.log('A NEW CHALLENGER HAS ARISEN');
   numPlayers = numPlayers + 1;
+  console.log('A NEW CHALLENGER HAS ARISEN. Num players: ' + numPlayers);
   if(numPlayers > 2)
   {
   	numPlayers = numPlayers - 1;
