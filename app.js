@@ -23,10 +23,11 @@ var validExtensions = {
 
 };
 
+var numPlayers = 0;
 
 
 var server = http.createServer( function(req, res) {
-
+	
 	var now = new Date();
 
 	var request = url.parse(req.url, true);
@@ -40,7 +41,7 @@ var server = http.createServer( function(req, res) {
 	if(filename != "/socket.io/")
 	{
 		//console.log(filename);
-		var exts = filename.split('.')
+		var exts = filename.split('.');
 		var ext = exts[exts.length - 1];
 		//console.log("AARGH: " + ext)
 
@@ -63,21 +64,33 @@ var server = http.createServer( function(req, res) {
 			});
 
 		} else {
-			console.log("Invalid file extension detected: " + ext)
+			console.log("Invalid file extension detected: " + ext);
 		}
 	}
+});
 
-})
-server.listen(port, serverUrl);
+server.listen(port, function() {
+  console.log('Server working at http://localhost:' + port);
+});
 
 var socket = io.listen(server); 
 
 socket.on('connection', function(client){
   console.log('A NEW CHALLENGER HAS ARISEN');
+  numPlayers = numPlayers + 1;
+  if(numPlayers > 2)
+  {
+  	numPlayers = numPlayers - 1;
+  	client.disconnect();
+  }
 	client.on('move', function(board){
 		console.log(board);
 		client.broadcast.emit('board', board);
 	});
+	client.on('disconnect', function() {
+		numPlayers = numPlayers - 1;
+        console.log('socket '+this.id+' disconnect');
+    });
 });
 
 
