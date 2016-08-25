@@ -96,9 +96,27 @@ server.listen(port, function() {
 });
 
 var socket = io.listen(server); 
+var white = false;
+var black = false;
 
 socket.on('connection', function(client){
   numPlayers = numPlayers + 1;
+  var playerColor = "";
+  if(white == false)
+  {
+	  client.emit("White");
+	  white = true;
+	  playerColor = "White";
+  }
+  else if(black == false)
+  {
+	  client.emit("Black");
+	  black = true;
+	  playerColor = "Black";
+  }
+  
+  
+  
   console.log('A NEW CHALLENGER HAS ARISEN. Num players: ' + numPlayers);
   if(numPlayers > 2)
   {
@@ -110,6 +128,14 @@ socket.on('connection', function(client){
 		client.broadcast.emit('board', board);
 	});
 	client.on('disconnect', function() {
+		if(playerColor == "White")
+		{
+			white = false;
+		}
+		else if(playerColor == "Black")
+		{
+			black = false;
+		}
 		numPlayers = numPlayers - 1;
         console.log('socket '+this.id+' disconnect');
     });
