@@ -23,17 +23,28 @@
             } else {
                 pieceColor = 1;
             }
+			
+			if(checkJumpMoveValid(xOldLocation, yOldLocation, xNewLocation, yNewLocation))
+			{
+				//Remove checker from old location
+				ModifySpace(xOldLocation, yOldLocation, 0);
+				//Remove jumped piece
+				ModifySpace((parseInt(xOldLocation) + parseInt(xNewLocation))/2, (parseInt(yOldLocation) + parseInt(yNewLocation))/2, 0);
+				//Add checker to new location
+				ModifySpace(xNewLocation, yNewLocation, pieceColor);
+				SendBoard();
+				turnPlayer = !turnPlayer;
+			}
 
-            if(checkMoveValid(xOldLocation, yOldLocation, xNewLocation, yNewLocation))
+            else if(checkMoveValid(xOldLocation, yOldLocation, xNewLocation, yNewLocation))
             {
-                //Remove checker from old location
+                /*Remove checker from old location*/
                 ModifySpace(xOldLocation, yOldLocation, 0);
-                //Add checker to new location
+                /*Add checker to new location*/
                 ModifySpace(xNewLocation, yNewLocation, pieceColor);
 				SendBoard();
 				turnPlayer = !turnPlayer;
-				console.log(turnPlayer);
-				
+				//console.log(turnPlayer);
             }
         }
 		
@@ -202,7 +213,7 @@
                 $(className).attr("src","black_checker.png");
             }
 			
-			//console.log(board[x - 1][y - 1]);
+			//console.log("x: " + x + "  y: " + y);
 			board[y - 1][x - 1] = i;
         }
 
