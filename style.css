@@ -1,11 +1,15 @@
 body {
-  background-color: #292829;
+  background-color: #242424;
   color: #f2f5f9;
-  font-family: Helvetica, monospace;
+  font-family: 'Roboto Condensed', sans-serif;
   font-size: 16px;
   max-width: 700px;
   margin-left: auto;
   margin-right: auto;
+}
+
+.navbar-inverse {
+    background-color: #424242 !important; 
 }
 
 table {
@@ -38,7 +42,7 @@ td .content {
 }
 
 .black {
-  background-color: #202020;
+  background-color: #707070;
 }
 
 .white {

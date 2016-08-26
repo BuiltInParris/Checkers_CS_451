@@ -25,8 +25,7 @@
 			{
                 pieceColor = 1;
             }
-			/*
-			//TODO: Figure out where the king logic goes
+			
 			else if(pieceColor == "white_king.png")
 			{
 				pieceColor == 3;
@@ -36,9 +35,6 @@
 				pieceColor == 4;
 			}
 			
-			
-			*/
-			
 			if(checkJumpMoveValid(xOldLocation, yOldLocation, xNewLocation, yNewLocation))
 			{
 				/*Remove checker from old location*/
@@ -46,18 +42,16 @@
 				/*Remove jumped piece*/
 				ModifySpace((parseInt(xOldLocation) + parseInt(xNewLocation))/2, (parseInt(yOldLocation) + parseInt(yNewLocation))/2, 0);
 				/*Add checker to new location*/
-				//TODO: check if a piece should be crowned
-				/*if(yNewLocation == 1)
-				{
+				//Check if a piece should be crowned
+				if((pieceColor == 2) && (yNewLocation == 1)){
+					console.log("BECAME KING");
 					ModifySpace(xNewLocation, yNewLocation, 4);
-				}
-				else if(yNewLocation == 8)
-				{
+				} else if((pieceColor == 1)&&(yNewLocation == 8)) {
+					console.log("BECAME KING");
 					ModifySpace(xNewLocation, yNewLocation, 3);
+				} else {
+					ModifySpace(xNewLocation, yNewLocation, pieceColor);
 				}
-				else { 
-				*/
-				ModifySpace(xNewLocation, yNewLocation, pieceColor);
 				SendBoard();
 				turnPlayer = !turnPlayer;
 			}
@@ -66,19 +60,16 @@
             {
                 /*Remove checker from old location*/
                 ModifySpace(xOldLocation, yOldLocation, 0);
-				/*if(yNewLocation == 1)
-				//TODO: check if a piece is crowned
-				{
+				//Check if a piece should be crowned
+				if((pieceColor == 2) && (yNewLocation == 1)){
+					console.log("BECAME KING");
 					ModifySpace(xNewLocation, yNewLocation, 4);
-				}
-				else if(yNewLocation == 8)
-				{
+				} else if((pieceColor == 1)&&(yNewLocation == 8)) {
+					console.log("BECAME KING");
 					ModifySpace(xNewLocation, yNewLocation, 3);
+				} else {
+					ModifySpace(xNewLocation, yNewLocation, pieceColor);
 				}
-				else { 
-				*/
-                /*Add checker to new location*/
-                ModifySpace(xNewLocation, yNewLocation, pieceColor);
 				SendBoard();
 				turnPlayer = !turnPlayer;
 				//console.log(turnPlayer);
@@ -182,8 +173,7 @@
 			return false;
 		}
 
-        function Piece(color,xlocation, ylocation)
-        {
+        function Piece(color,xlocation, ylocation) {
            this.color=color;
            this.xlocation=xlocation;
            this.ylocation=ylocation;
@@ -215,9 +205,6 @@
 			console.log("Black player");
 		});
 		
-		
-		
-
         function mirrorBoard(new_board){
             for(i=0; i < new_board.length; i++)
             {
@@ -254,14 +241,16 @@
         {
             var className = ".column" + x + ".row" + y;
 			
-            if(i == 0)
-            {
+            if(i == 0){
                 $(className).attr("src","");
-            } else if(i == 1)
-            {
+            } else if(i == 1){
                 $(className).attr("src","white_checker.png");
             } else if(i == 2) {
                 $(className).attr("src","black_checker.png");
+            } else if(i == 3) {
+                $(className).attr("src","white_king.png");
+            } else if(i == 4) {
+                $(className).attr("src","black_king.png");
             }
 			
 			//console.log("x: " + x + "  y: " + y);
