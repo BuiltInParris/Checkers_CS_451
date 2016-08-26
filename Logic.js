@@ -20,17 +20,43 @@
             if(pieceColor == "black_checker.png")
             {
                 pieceColor = 2;
-            } else {
+            } 
+			else if (pieceColor == "white_checker.png")
+			{
                 pieceColor = 1;
             }
+			/*
+			//TODO: Figure out where the king logic goes
+			else if(pieceColor == "white_king.png")
+			{
+				pieceColor == 3;
+			}
+			else if(pieceColor == "black_king.png")
+			{
+				pieceColor == 4;
+			}
+			
+			
+			*/
 			
 			if(checkJumpMoveValid(xOldLocation, yOldLocation, xNewLocation, yNewLocation))
 			{
-				//Remove checker from old location
+				/*Remove checker from old location*/
 				ModifySpace(xOldLocation, yOldLocation, 0);
-				//Remove jumped piece
+				/*Remove jumped piece*/
 				ModifySpace((parseInt(xOldLocation) + parseInt(xNewLocation))/2, (parseInt(yOldLocation) + parseInt(yNewLocation))/2, 0);
-				//Add checker to new location
+				/*Add checker to new location*/
+				//TODO: check if a piece should be crowned
+				/*if(yNewLocation == 1)
+				{
+					ModifySpace(xNewLocation, yNewLocation, 4);
+				}
+				else if(yNewLocation == 8)
+				{
+					ModifySpace(xNewLocation, yNewLocation, 3);
+				}
+				else { 
+				*/
 				ModifySpace(xNewLocation, yNewLocation, pieceColor);
 				SendBoard();
 				turnPlayer = !turnPlayer;
@@ -40,6 +66,17 @@
             {
                 /*Remove checker from old location*/
                 ModifySpace(xOldLocation, yOldLocation, 0);
+				/*if(yNewLocation == 1)
+				//TODO: check if a piece is crowned
+				{
+					ModifySpace(xNewLocation, yNewLocation, 4);
+				}
+				else if(yNewLocation == 8)
+				{
+					ModifySpace(xNewLocation, yNewLocation, 3);
+				}
+				else { 
+				*/
                 /*Add checker to new location*/
                 ModifySpace(xNewLocation, yNewLocation, pieceColor);
 				SendBoard();
@@ -48,18 +85,16 @@
             }
         }
 		
-		/*Valid Move Black
-		function checkMoveValid(xOldLocation, yOldlocation, xNewLocation, yNewLocatoin)
-		{
-			if((xOldLocation - xNewLocation) <= 1 && (yOldLocation - yNewLocation) <= 1)
-		
-		*/
 
-		//This is how king moves work
+
         function checkMoveValid(xOldLocation, yOldLocation, xNewLocation, yNewLocation)
         {
-			//White Move
-			if((playerColor == "White") && (Math.abs(xOldLocation - xNewLocation) <= 1 && (yOldLocation - yNewLocation <= -1)))
+			/*Check if white is making a valid move */
+			var whiteCondition = ((playerColor == "White") && (Math.abs(xOldLocation - xNewLocation) == 1 && (yOldLocation - yNewLocation == -1)));
+			/*Check if black is making a vlid move*/
+			var blackCondition = ((playerColor == "Black") && (Math.abs(xOldLocation - xNewLocation) == 1 && (yOldLocation - yNewLocation == 1)));
+			
+			if(whiteCondition || blackCondition)
             {
                 var className = ".column" + xNewLocation + ".row" + yNewLocation;
                 
@@ -70,22 +105,10 @@
                     return true;
                 }
             }
-			
-			//Black Move
-			else if((playerColor == "Black") && (Math.abs(xOldLocation - xNewLocation) == 1 && (yOldLocation - yNewLocation == 1)))
-            {
-                var className = ".column" + xNewLocation + ".row" + yNewLocation;
-                
-                //console.log($(className).attr('src'));
-                if($(className).attr('src') == "")
-                {
-                    console.log("valid src");
-                    return true;
-                }
-            }
-			
-            /*King move
-            if(Math.abs(xOldLocation - xNewLocation) <= 1 && Math.abs(yOldLocation - yNewLocation) <= 1)
+		
+            /*How a king moves
+			//TODO: figure out where to stick this
+            if(Math.abs(xOldLocation - xNewLocation) == 1 && Math.abs(yOldLocation - yNewLocation) == 1)
             {
                 var className = ".column" + xNewLocation + ".row" + yNewLocation;
                 
@@ -100,34 +123,61 @@
             return false;
         }
 		
-		//Jump moves for normal Men
+		/*Jump check for man piece*/
 		function checkJumpMoveValid(xOldLocation, yOldLocation, xNewLocation, yNewLocation)
 		{
-			//White Move
-			if((playerColor == "White") && (Math.abs(xOldLocation - xNewLocation) == 2 && (yOldLocation - yNewLocation == -2)))
+			/*Check if white is making a valid move */
+			var whiteCondition = ((playerColor == "White") && (Math.abs(xOldLocation - xNewLocation) == 2 && (yOldLocation - yNewLocation == -2)));
+			/*Check if black is making a vlid move*/
+			var blackCondition = ((playerColor == "Black") && (Math.abs(xOldLocation - xNewLocation) == 2 && (yOldLocation - yNewLocation == 2)));
+			
+			
+			if(whiteCondition || blackCondition)
             {
                 var className = ".column" + xNewLocation + ".row" + yNewLocation;
+				var jumpedX = (parseInt(xOldLocation) + parseInt(xNewLocation))/2;
+				var jumpedY = (parseInt(yOldLocation) + parseInt(yNewLocation))/2;
+                var remClassName = ".column" + jumpedX + ".row" + jumpedY;
+				
+				/*Booleans*/
+				var whiteCap = ($(remClassName).attr('src') == "black_checker.png" && whiteCondition);
+				var blackCap = ($(remClassName).attr('src') == "white_checker.png" && blackCondition);
                 
-                //console.log($(className).attr('src'));
-                if($(className).attr('src') == "")
+				//console.log($(className).attr('src'));
+				/*Make sure the space going to is blank*/
+                if(($(className).attr('src') == "" && whiteCap) || ($(className).attr('src') == "" && blackCap))
                 {
                     console.log("valid src");
                     return true;
                 }
             }
 			
-			//Black Move
-			else if((playerColor == "Black") && (Math.abs(xOldLocation - xNewLocation) == 2 && (yOldLocation - yNewLocation == 2)))
+			
+			/*How a king jumps
+			//TODO: figure out where to stick this
+
+			
+			
+			if(Math.abs(xOldLocation - xNewLocation) == 2 && Math.abs(yOldLocation - yNewLocation) == 2)
             {
                 var className = ".column" + xNewLocation + ".row" + yNewLocation;
+				var jumpedX = (parseInt(xOldLocation) + parseInt(xNewLocation))/2;
+				var jumpedY = (parseInt(yOldLocation) + parseInt(yNewLocation))/2;
+                var remClassName = ".column" + jumpedX + ".row" + jumpedY;
+				
+				/*Booleans
+				var whiteCap = ($(remClassName).attr('src') == "black_checker.png" && playerColor == "White");
+				var blackCap = ($(remClassName).attr('src') == "white_checker.png" && playerColor == "Black");
                 
-                //console.log($(className).attr('src'));
-                if($(className).attr('src') == "")
+				//console.log($(className).attr('src'));
+				/*Make sure the space going to is blank
+                if(($(className).attr('src') == "" && whiteCap) || ($(className).attr('src') == "" && blackCap))
                 {
                     console.log("valid src");
                     return true;
                 }
             }
+			Javascript comments are weird so be careful when you copy paste this*/
 			
 			return false;
 		}
@@ -190,6 +240,7 @@
             }
 			//console.log(playerColor);
 
+			//Maybe put king logic here
             if((($(this).find("img").attr('src') == "white_checker.png" && playerColor == "White") || ($(this).find("img").attr('src') == "black_checker.png" && playerColor == "Black")) && turnPlayer)
             {
                 oldChecker = [$(this).find("img").attr('class').split(' ')[2][6], $(this).find("img").attr('class').split(' ')[1][3], $(this).find("img").attr('src')];
