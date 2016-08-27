@@ -25,17 +25,16 @@
 			{
                 pieceColor = 1;
             }
-			
-			else if(pieceColor == "white_king.png")
+			else if (pieceColor == "white_king.png")
 			{
-				pieceColor == 3;
+				pieceColor = 3;
 			}
-			else if(pieceColor == "black_king.png")
+			else if (pieceColor == "black_king.png")
 			{
-				pieceColor == 4;
+				pieceColor = 4;
 			}
-			
-			if(checkJumpMoveValid(xOldLocation, yOldLocation, xNewLocation, yNewLocation))
+
+			if(checkJumpMoveValid(pieceColor, xOldLocation, yOldLocation, xNewLocation, yNewLocation))
 			{
 				/*Remove checker from old location*/
 				ModifySpace(xOldLocation, yOldLocation, 0);
@@ -54,9 +53,10 @@
 				}
 				SendBoard();
 				turnPlayer = !turnPlayer;
+				checkWinner();
 			}
 
-            else if(checkMoveValid(xOldLocation, yOldLocation, xNewLocation, yNewLocation))
+            else if(checkMoveValid(pieceColor, xOldLocation, yOldLocation, xNewLocation, yNewLocation))
             {
                 /*Remove checker from old location*/
                 ModifySpace(xOldLocation, yOldLocation, 0);
@@ -72,18 +72,20 @@
 				}
 				SendBoard();
 				turnPlayer = !turnPlayer;
+				checkWinner();
 				//console.log(turnPlayer);
             }
         }
 		
 
 
-        function checkMoveValid(xOldLocation, yOldLocation, xNewLocation, yNewLocation)
+        function checkMoveValid(pieceColor, xOldLocation, yOldLocation, xNewLocation, yNewLocation)
         {
+			console.log(pieceColor);
 			/*Check if white is making a valid move */
-			var whiteCondition = ((playerColor == "White") && (Math.abs(xOldLocation - xNewLocation) == 1 && (yOldLocation - yNewLocation == -1)));
-			/*Check if black is making a vlid move*/
-			var blackCondition = ((playerColor == "Black") && (Math.abs(xOldLocation - xNewLocation) == 1 && (yOldLocation - yNewLocation == 1)));
+			var whiteCondition = ((playerColor == "White") && ((Math.abs(xOldLocation - xNewLocation) == 1 && (yOldLocation - yNewLocation == -1)) || (pieceColor == 3 && Math.abs(xOldLocation - xNewLocation) == 1 && Math.abs(yOldLocation - yNewLocation) == 1)));
+			/*Check if black is making a valid move*/
+			var blackCondition = ((playerColor == "Black") && ((Math.abs(xOldLocation - xNewLocation) == 1 && (yOldLocation - yNewLocation ==  1)) || (pieceColor == 4 && Math.abs(xOldLocation - xNewLocation) == 1 && Math.abs(yOldLocation - yNewLocation) == 1)));
 			
 			if(whiteCondition || blackCondition)
             {
@@ -96,32 +98,18 @@
                     return true;
                 }
             }
-		
-            /*How a king moves
-			//TODO: figure out where to stick this
-            if(Math.abs(xOldLocation - xNewLocation) == 1 && Math.abs(yOldLocation - yNewLocation) == 1)
-            {
-                var className = ".column" + xNewLocation + ".row" + yNewLocation;
-                
-                //console.log($(className).attr('src'));
-                if($(className).attr('src') == "")
-                {
-                    console.log("valid src");
-                    return true;
-                }
-            }
-			*/
+
             return false;
         }
 		
 		/*Jump check for man piece*/
-		function checkJumpMoveValid(xOldLocation, yOldLocation, xNewLocation, yNewLocation)
+		function checkJumpMoveValid(pieceColor, xOldLocation, yOldLocation, xNewLocation, yNewLocation)
 		{
+			console.log(pieceColor);
 			/*Check if white is making a valid move */
-			var whiteCondition = ((playerColor == "White") && (Math.abs(xOldLocation - xNewLocation) == 2 && (yOldLocation - yNewLocation == -2)));
-			/*Check if black is making a vlid move*/
-			var blackCondition = ((playerColor == "Black") && (Math.abs(xOldLocation - xNewLocation) == 2 && (yOldLocation - yNewLocation == 2)));
-			
+			var whiteCondition = ((playerColor == "White") && ((Math.abs(xOldLocation - xNewLocation) == 2 && (yOldLocation - yNewLocation == -2)) || (pieceColor == 3 && Math.abs(xOldLocation - xNewLocation) == 2 && Math.abs(yOldLocation - yNewLocation) == 2)));
+			/*Check if black is making a valid move*/
+			var blackCondition = ((playerColor == "Black") && ((Math.abs(xOldLocation - xNewLocation) == 2 && (yOldLocation - yNewLocation ==  2)) || (pieceColor == 4 && Math.abs(xOldLocation - xNewLocation) == 2 && Math.abs(yOldLocation - yNewLocation) == 2)));
 			
 			if(whiteCondition || blackCondition)
             {
@@ -143,33 +131,6 @@
                 }
             }
 			
-			
-			/*How a king jumps
-			//TODO: figure out where to stick this
-
-			
-			
-			if(Math.abs(xOldLocation - xNewLocation) == 2 && Math.abs(yOldLocation - yNewLocation) == 2)
-            {
-                var className = ".column" + xNewLocation + ".row" + yNewLocation;
-				var jumpedX = (parseInt(xOldLocation) + parseInt(xNewLocation))/2;
-				var jumpedY = (parseInt(yOldLocation) + parseInt(yNewLocation))/2;
-                var remClassName = ".column" + jumpedX + ".row" + jumpedY;
-				
-				/*Booleans
-				var whiteCap = ($(remClassName).attr('src') == "black_checker.png" && playerColor == "White");
-				var blackCap = ($(remClassName).attr('src') == "white_checker.png" && playerColor == "Black");
-                
-				//console.log($(className).attr('src'));
-				/*Make sure the space going to is blank
-                if(($(className).attr('src') == "" && whiteCap) || ($(className).attr('src') == "" && blackCap))
-                {
-                    console.log("valid src");
-                    return true;
-                }
-            }
-			Javascript comments are weird so be careful when you copy paste this*/
-			
 			return false;
 		}
 
@@ -185,6 +146,7 @@
             console.log("Recieved new board");
 			mirrorBoard(board);
 			turnPlayer = !turnPlayer;
+			checkWinner();
 			console.log("Now Turn");
         });
 
@@ -217,6 +179,31 @@
             }
         }
 		
+		function announceWinner(color) {
+			alert(color + "Won!");
+		}
+		function checkWinner() {
+			var numWhite = 0; // Number of white pieces left
+			var numBlack = 0; // Number of black pieces left
+			for(i=0; i < board.length; i++)
+			{
+				row = board[i];
+				for(j=0; j < row.length; j++)
+				{
+					if(row[j] == 1)
+						numWhite++;
+					else if(row[j] == 2)
+						numBlack++;
+				}
+			}
+			//console.log(numBlack);
+			//console.log(numWhite);
+			if(numBlack == 0)
+				announceWinner("white");
+			else if(numWhite == 0)
+				announceWinner("black");
+		}
+		
 		//Click on a black square
         $( ".black" ).click(function() {
             if(oldChecker != null)
@@ -227,8 +214,7 @@
             }
 			//console.log(playerColor);
 
-			//Maybe put king logic here
-            if((($(this).find("img").attr('src') == "white_checker.png" && playerColor == "White") || ($(this).find("img").attr('src') == "black_checker.png" && playerColor == "Black")) && turnPlayer)
+            if(turnPlayer &&((playerColor == "White" &&($(this).find("img").attr('src') == "white_checker.png" ||$(this).find("img").attr('src') == "white_king.png")) ||(playerColor == "Black" &&($(this).find("img").attr('src') == "black_checker.png" ||$(this).find("img").attr('src') == "black_king.png"))))
             {
                 oldChecker = [$(this).find("img").attr('class').split(' ')[2][6], $(this).find("img").attr('class').split(' ')[1][3], $(this).find("img").attr('src')];
                 //console.log($(this).find("img").attr('src'));
