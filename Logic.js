@@ -2,6 +2,28 @@
 	var playerColor = "";
 	var turnPlayer = false;
 	//var jumpFlag = false; set to true after a jump is madeif another jump can be made
+    
+	/* // End Game Take Piece
+    var board = [[0, 0, 0, 0, 0, 0, 0, 0], 
+                 [0, 1, 0, 0, 0, 0, 0, 0], 
+                 [0, 0, 2, 0, 0, 0, 0, 0], 
+                 [0, 0, 0, 0, 0, 0, 0, 0], 
+                 [0, 0, 0, 0, 0, 0, 0, 0], 
+                 [0, 0, 0, 0, 0, 0, 0, 0], 
+                 [0, 0, 0, 0, 0, 0, 0, 0], 
+                 [0, 0, 0, 0, 0, 0, 0, 0]];*/
+
+    /*// End Game No Moves
+    var board = [[1, 0, 1, 0, 0, 0, 0, 0], 
+                 [0, 2, 0, 0, 0, 0, 0, 0], 
+                 [0, 0, 2, 0, 2, 0, 0, 0], 
+                 [0, 0, 0, 0, 0, 0, 0, 0], 
+                 [0, 0, 0, 0, 0, 0, 0, 0], 
+                 [0, 0, 0, 0, 0, 0, 0, 0], 
+                 [0, 0, 0, 0, 0, 0, 0, 0], 
+                 [0, 0, 0, 0, 0, 0, 0, 0]];*/
+
+
     var board = [[1, 0, 1, 0, 1, 0, 1, 0], 
                  [0, 1, 0, 1, 0, 1, 0, 1], 
                  [1, 0, 1, 0, 1, 0, 1, 0], 
@@ -11,12 +33,14 @@
                  [2, 0, 2, 0, 2, 0, 2, 0], 
                  [0, 2, 0, 2, 0, 2, 0, 2]];
 
-    var oldChecker = [];
+    var oldChecker = null;
+    var JumpsArray = [];
 
     $( document ).ready(function() {
 
         function MovePiece(pieceColor, xOldLocation, yOldLocation, xNewLocation, yNewLocation)
         {
+        	console.log(pieceColor);
             if(pieceColor == "black_checker.png")
             {
                 pieceColor = 2;
@@ -51,9 +75,19 @@
 				} else {
 					ModifySpace(xNewLocation, yNewLocation, pieceColor);
 				}
+				
+				while(((pieceColor == 1 || pieceColor == 2) && availableCheckerJump(xNewLocation, yNewLocation)) || ((pieceColor == 3 || pieceColor == 4) && availableKingJump(xNewLocation, yNewLocation)))
+				{
+					/* Returns as an array of arrays, with stored coordinates
+					   Use same logic as in availableKingJump and availableCheckerJump to find those coordinates */
+					// JumpsArray = getAvailableJumps();
+					// Once you have those coordinates, present user with the choices (however you want to do that).
+				}
+
+
 				SendBoard();
 				turnPlayer = !turnPlayer;
-				checkWinner();
+				//checkWinner();
 			}
 
             else if(checkMoveValid(pieceColor, xOldLocation, yOldLocation, xNewLocation, yNewLocation))
@@ -72,7 +106,7 @@
 				}
 				SendBoard();
 				turnPlayer = !turnPlayer;
-				checkWinner();
+				//checkWinner();
 				//console.log(turnPlayer);
             }
         }
@@ -134,6 +168,80 @@
 			return false;
 		}
 
+		 function availableCheckerMove(x, y){
+            if((x < 7 && y < 7 && board[x+1][y+1] == 0) || (x > 0 && y < 7 && board[x-1][y+1] == 0))
+            {
+                return true;
+            }
+
+            return false;
+        }
+        function availableKingMove(x, y){
+            if((x < 7 && y < 7 && board[x+1][y+1] == 0) || (x > 0 && y < 7 && board[x-1][y+1] == 0) || (x < 7 && y > 0 && board[x+1][y-1] == 0) || (x > 0 && y > 0 && board[x-1][y-1] == 0))
+            {
+                return true;
+            }
+            return false;
+        }
+        function availableCheckerJump(x, y){
+            if((x < 6 && y < 6 && isEnemyPiece(x+1, y+1) && board[x+2][y+2] == 0) || (x > 1 && y < 6 && isEnemyPiece(x-1, y+1) && board[x-2][y+2] == 0))
+            {
+                return true;
+            }
+            return f
+
+        function availableKingJump(x, y){
+            if((x < 6 && y < 6 && isEnemyPiece(x+1, y+1) && board[x+2][y+2] == 0) || (x > 1 && y < 6 && isEnemyPiece(x-1, y+1) && board[x-2][y+2] == 0) || (x < 6 && y > 1 && isEnemyPiece(x+1, y-1) && board[x+2][y-2] == 0) || (x > 1 && y > 1 && isEnemyPiece(x-1, y-1) && board[x-2][y-2] == 0))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        function isEnemyPiece(x, y)
+        {
+        	if(playerColor == "White")
+        	{
+	        	if(board[x][y] == 2 || board[x][y] == 4)
+	        	{
+	        		return true;
+	        	}
+        	} else {
+				if(board[x][y] == 1 || board[x][y] == 3)
+	        	{
+	        		return true;
+	        	}
+        	}
+        	return false;
+        }
+
+        function checkAvailableMove(){ 
+            for(x = 0; x < board.length; x++)
+            {
+                for(y = 0; y < board[x].length; y++)
+                {
+                    if(playerColor == "White")
+                    {
+                    	if((board[x][y] == 1 && (availableCheckerMove(x,y) || availableCheckerJump(x,y))) || (board[x][y] == 3 && (availableKingMove(x,y) || availableKingJump(x,y))))
+                        {
+                            console.log("TRUE AT: (" + x + ", " + y + ") = " + board[x][y]);
+                            return true;
+                        }
+                    } else if (playerColor = "Black") {
+                    	console.log("Checker move available: " + availableCheckerMove(x,y) + " - Checker jump available: " + availableCheckerJump(x,y));
+                        if((board[x][y] == 2 && (availableCheckerMove(x,y) || availableCheckerJump(x,y))) || (board[x][y] == 4 && (availableKingMove(x,y) || availableKingJump(x,y))))
+                        {
+                            console.log("TRUE AT: (" + x + ", " + y + ") = " + board[x][y]);
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            console.log("FALSE OH GEEZ.");
+            return false;
+        }
+
         function Piece(color,xlocation, ylocation) {
            this.color=color;
            this.xlocation=xlocation;
@@ -146,8 +254,16 @@
             console.log("Recieved new board");
 			mirrorBoard(board);
 			turnPlayer = !turnPlayer;
-			checkWinner();
 			console.log("Now Turn");
+			if(!checkAvailableMove())
+			{
+				socket.emit('end_game', true);
+				window.location.href = "/Loser";
+			}
+        });
+
+        socket.on('game_over', function(val){
+			window.location.href = "/Winner";
         });
 
         socket.on('disconnect', function(){
@@ -208,6 +324,7 @@
         $( ".black" ).click(function() {
             if(oldChecker != null)
             {
+            	console.log(oldChecker);
                 var rowNum = $(this).find("img").attr('class').split(' ')[1][3];
                 var colNum = $(this).find("img").attr('class').split(' ')[2][6];
                 MovePiece(oldChecker[2], oldChecker[0], oldChecker[1], colNum, rowNum);

@@ -60,6 +60,16 @@ var server = http.createServer( function(req, res) {
 		filename = "/instructions.html";
 	}
 
+	if(filename == "/Winner")
+	{
+		filename = "/winner.html";
+	}
+
+	if(filename == "/Loser")
+	{
+		filename = "/loser.html";
+	}
+
 	if(filename != "/socket.io/")
 	{
 		//console.log(filename);
@@ -127,6 +137,12 @@ socket.on('connection', function(client){
 		console.log(board);
 		client.broadcast.emit('board', board);
 	});
+
+	client.on('end_game', function(val){
+		console.log("Game over!");
+		client.broadcast.emit('game_over');
+	});
+
 	client.on('disconnect', function() {
 		if(playerColor == "White")
 		{
