@@ -1,7 +1,7 @@
     var socket = io.connect();
 	var playerColor = "";
 	var turnPlayer = false;
-	//var jumpFlag = false; set to true after a jump is madeif another jump can be made
+	var chainJumpFlag = false; //set to true after a jump is madeif another jump can be made
     
 	/* // End Game Take Piece
     var board = [[0, 0, 0, 0, 0, 0, 0, 0], 
@@ -34,13 +34,15 @@
                  [0, 2, 0, 2, 0, 2, 0, 2]];
 
     var oldChecker = null;
-    var JumpsArray = [];
+    var availableJumps = [];
+    var beforeJump = [];
+    var lastSixBoards = [];
 
     $( document ).ready(function() {
 
         function MovePiece(pieceColor, xOldLocation, yOldLocation, xNewLocation, yNewLocation)
         {
-        	console.log(pieceColor);
+            console.log(pieceColor);
             if(pieceColor == "black_checker.png")
             {
                 pieceColor = 2;
@@ -58,7 +60,7 @@
 				pieceColor = 4;
 			}
 
-			if(checkJumpMoveValid(pieceColor, xOldLocation, yOldLocation, xNewLocation, yNewLocation))
+			if((chainJumpFlag && checkChainJumpMoveValid(xOldLocation, yOldLocation, xNewLocation, yNewLocation))||(!chainJumpFlag && checkJumpMoveValid(pieceColor, xOldLocation, yOldLocation, xNewLocation, yNewLocation)))
 			{
 				/*Remove checker from old location*/
 				ModifySpace(xOldLocation, yOldLocation, 0);
@@ -67,30 +69,43 @@
 				/*Add checker to new location*/
 				//Check if a piece should be crowned
 				if((pieceColor == 2) && (yNewLocation == 1)){
+                    pieceColor = 4;
 					console.log("BECAME KING");
 					ModifySpace(xNewLocation, yNewLocation, 4);
 				} else if((pieceColor == 1)&&(yNewLocation == 8)) {
+                    pieceColor = 3;
 					console.log("BECAME KING");
 					ModifySpace(xNewLocation, yNewLocation, 3);
 				} else {
 					ModifySpace(xNewLocation, yNewLocation, pieceColor);
 				}
+                chainJumpFlag = false;
+                hideAvailableJumps();
 				
-				while(((pieceColor == 1 || pieceColor == 2) && availableCheckerJump(xNewLocation, yNewLocation)) || ((pieceColor == 3 || pieceColor == 4) && availableKingJump(xNewLocation, yNewLocation)))
-				{
+				if(((pieceColor == 1 || pieceColor == 2) && availableCheckerJump(parseInt(xNewLocation)-1, parseInt(yNewLocation)-1) || ((pieceColor == 3 || pieceColor == 4) && availableKingJump(parseInt(xNewLocation)-1, parseInt(yNewLocation)-1))))
+                {
 					/* Returns as an array of arrays, with stored coordinates
 					   Use same logic as in availableKingJump and availableCheckerJump to find those coordinates */
-					// JumpsArray = getAvailableJumps();
+					//SendBoard();
+                    if(pieceColor == 1 || pieceColor == 2){
+                        availableJumps = getAvailableCheckerJumps(parseInt(xNewLocation)-1, parseInt(yNewLocation)-1);
+                    } else {
+                        availableJumps = getAvailableKingJumps(parseInt(xNewLocation)-1, parseInt(yNewLocation)-1);
+                    }
+                    chainJumpFlag  = true;
+                    beforeJump = [parseInt(xNewLocation), parseInt(yNewLocation)];
+                    showAvailableJumps();
 					// Once you have those coordinates, present user with the choices (however you want to do that).
-				}
-
-
-				SendBoard();
-				turnPlayer = !turnPlayer;
-				//checkWinner();
+				} else {
+                    saveBoard();
+                    checkForThreeRepeatedMoveDraw();
+                    SendBoard();
+                    turnPlayer = !turnPlayer;
+                    //checkWinner();
+                }
 			}
 
-            else if(checkMoveValid(pieceColor, xOldLocation, yOldLocation, xNewLocation, yNewLocation))
+            else if(!chainJumpFlag && checkMoveValid(pieceColor, xOldLocation, yOldLocation, xNewLocation, yNewLocation))
             {
                 /*Remove checker from old location*/
                 ModifySpace(xOldLocation, yOldLocation, 0);
@@ -153,8 +168,8 @@
                 var remClassName = ".column" + jumpedX + ".row" + jumpedY;
 				
 				/*Booleans*/
-				var whiteCap = ($(remClassName).attr('src') == "black_checker.png" && whiteCondition);
-				var blackCap = ($(remClassName).attr('src') == "white_checker.png" && blackCondition);
+				var whiteCap = (($(remClassName).attr('src') == "black_checker.png" || $(remClassName).attr('src') == "black_king.png") && whiteCondition);
+				var blackCap = (($(remClassName).attr('src') == "white_checker.png" || $(remClassName).attr('src') == "white_king.png") && blackCondition);
                 
 				//console.log($(className).attr('src'));
 				/*Make sure the space going to is blank*/
@@ -168,30 +183,59 @@
 			return false;
 		}
 
-		 function availableCheckerMove(x, y){
-            if((x < 7 && y < 7 && board[x+1][y+1] == 0) || (x > 0 && y < 7 && board[x-1][y+1] == 0))
-            {
-                return true;
+        function checkChainJumpMoveValid(xOldLocation, yOldLocation, xNewLocation, yNewLocation){
+            if ((xOldLocation) == beforeJump[0] && (yOldLocation) == beforeJump[1]){
+                for (i = 0; i < availableJumps.length ; i++) {
+                    if(availableJumps[i][0] == (xNewLocation-1) && availableJumps[i][1] == (yNewLocation-1)){
+                        return true;
+                    }
+                }
             }
+            return false;
+        }
 
-            return false;
+		function availableCheckerMove(x, y){
+            if (playerColor == "White"){
+                if((x < 7 && y < 7 && board[y+1][x+1] == 0) || (x > 0 && y < 7 && board[y+1][x-1] == 0))
+                {
+                    return true;
+                }
+                return false;
+            } else {
+                if((x < 7 && y > 0 && board[y-1][x+1] == 0) || (x > 0 && y > 0 && board[y-1][x-1] == 0))
+                {
+                    return true;
+                }
+                return false;
+            }
         }
+
         function availableKingMove(x, y){
-            if((x < 7 && y < 7 && board[x+1][y+1] == 0) || (x > 0 && y < 7 && board[x-1][y+1] == 0) || (x < 7 && y > 0 && board[x+1][y-1] == 0) || (x > 0 && y > 0 && board[x-1][y-1] == 0))
+            if((x < 7 && y < 7 && board[y+1][x+1] == 0) || (x > 0 && y < 7 && board[y+1][x-1] == 0) || (x < 7 && y > 0 && board[y-1][x+1] == 0) || (x > 0 && y > 0 && board[y-1][x-1] == 0))
             {
                 return true;
             }
             return false;
         }
+
         function availableCheckerJump(x, y){
-            if((x < 6 && y < 6 && isEnemyPiece(x+1, y+1) && board[x+2][y+2] == 0) || (x > 1 && y < 6 && isEnemyPiece(x-1, y+1) && board[x-2][y+2] == 0))
-            {
-                return true;
+            if(playerColor == "White"){
+                if((x < 6 && y < 6 && isEnemyPiece(x+1, y+1) && board[y+2][x+2] == 0) || (x > 1 && y < 6 && isEnemyPiece(x-1, y+1) && board[y+2][x-2] == 0))
+                {
+                    return true;
+                }
+                return false;
+            } else {
+                if((x < 6 && y > 1 && isEnemyPiece(x+1, y-1) && board[y-2][x+2] == 0) || (x > 1 && y > 1 && isEnemyPiece(x-1, y-1) && board[y-2][x-2] == 0))
+                {
+                    return true;
+                }
+                return false;
             }
-            return f
+        }
 
         function availableKingJump(x, y){
-            if((x < 6 && y < 6 && isEnemyPiece(x+1, y+1) && board[x+2][y+2] == 0) || (x > 1 && y < 6 && isEnemyPiece(x-1, y+1) && board[x-2][y+2] == 0) || (x < 6 && y > 1 && isEnemyPiece(x+1, y-1) && board[x+2][y-2] == 0) || (x > 1 && y > 1 && isEnemyPiece(x-1, y-1) && board[x-2][y-2] == 0))
+            if((x < 6 && y < 6 && isEnemyPiece(x+1, y+1) && board[y+2][x+2] == 0) || (x > 1 && y < 6 && isEnemyPiece(x-1, y+1) && board[y+2][x-2] == 0) || (x < 6 && y > 1 && isEnemyPiece(x+1, y-1) && board[y-2][x+2] == 0) || (x > 1 && y > 1 && isEnemyPiece(x-1, y-1) && board[y-2][x-2] == 0))
             {
                 return true;
             }
@@ -202,12 +246,12 @@
         {
         	if(playerColor == "White")
         	{
-	        	if(board[x][y] == 2 || board[x][y] == 4)
+	        	if(board[y][x] == 2 || board[y][x] == 4)
 	        	{
 	        		return true;
 	        	}
         	} else {
-				if(board[x][y] == 1 || board[x][y] == 3)
+				if(board[y][x] == 1 || board[y][x] == 3)
 	        	{
 	        		return true;
 	        	}
@@ -216,22 +260,22 @@
         }
 
         function checkAvailableMove(){ 
-            for(x = 0; x < board.length; x++)
+            for(y = 0; y < board.length; y++)
             {
-                for(y = 0; y < board[x].length; y++)
+                for(x = 0; x < board[y].length; x++)
                 {
                     if(playerColor == "White")
                     {
-                    	if((board[x][y] == 1 && (availableCheckerMove(x,y) || availableCheckerJump(x,y))) || (board[x][y] == 3 && (availableKingMove(x,y) || availableKingJump(x,y))))
+                    	if((board[y][x] == 1 && (availableCheckerMove(x,y) || availableCheckerJump(x,y))) || (board[y][x] == 3 && (availableKingMove(x,y) || availableKingJump(x,y))))
                         {
-                            console.log("TRUE AT: (" + x + ", " + y + ") = " + board[x][y]);
+                            console.log("TRUE AT: (" + x + ", " + y + ") = " + board[y][x]);
                             return true;
                         }
                     } else if (playerColor = "Black") {
                     	console.log("Checker move available: " + availableCheckerMove(x,y) + " - Checker jump available: " + availableCheckerJump(x,y));
-                        if((board[x][y] == 2 && (availableCheckerMove(x,y) || availableCheckerJump(x,y))) || (board[x][y] == 4 && (availableKingMove(x,y) || availableKingJump(x,y))))
+                        if((board[y][x] == 2 && (availableCheckerMove(x,y) || availableCheckerJump(x,y))) || (board[y][x] == 4 && (availableKingMove(x,y) || availableKingJump(x,y))))
                         {
-                            console.log("TRUE AT: (" + x + ", " + y + ") = " + board[x][y]);
+                            console.log("TRUE AT: (" + x + ", " + y + ") = " + board[y][x]);
                             return true;
                         }
                     }
@@ -240,6 +284,43 @@
 
             console.log("FALSE OH GEEZ.");
             return false;
+        }
+
+        function getAvailableCheckerJumps(x, y){
+            var availableJumps = [];
+            if(playerColor == "White"){
+                if(x < 6 && y < 6 && isEnemyPiece(x+1, y+1) && board[y+2][x+2] == 0) {
+                    availableJumps.push([x+2, y+2]);
+                }
+                if (x > 1 && y < 6 && isEnemyPiece(x-1, y+1) && board[y+2][x-2] == 0) {
+                    availableJumps.push([x-2, y+2]);
+                }
+            } else {
+                if(x < 6 && y > 1 && isEnemyPiece(x+1, y-1) && board[y-2][x+2] == 0) {
+                    availableJumps.push([x+2, y-2]);
+                }
+                if (x > 1 && y > 1 && isEnemyPiece(x-1, y-1) && board[y-2][x-2] == 0) {
+                    availableJumps.push([x-2, y-2]);
+                }
+            }
+            return availableJumps;
+        }
+
+        function getAvailableKingJumps(x, y){
+            var availableJumps = [];
+            if(x < 6 && y < 6 && isEnemyPiece(x+1, y+1) && board[y+2][x+2] == 0) {
+                    availableJumps.push([x+2, y+2]);
+            } 
+            if(x > 1 && y < 6 && isEnemyPiece(x-1, y+1) && board[y+2][x-2] == 0) {
+                    availableJumps.push([x-2, y+2]);
+            }
+            if(x < 6 && y > 1 && isEnemyPiece(x+1, y-1) && board[y-2][x+2] == 0) {
+                    availableJumps.push([x+2, y-2]);
+            }
+            if(x > 1 && y > 1 && isEnemyPiece(x-1, y-1) && board[y-2][x-2] == 0) {
+                    availableJumps.push([x-2, y-2]);
+            }
+            return availableJumps;
         }
 
         function Piece(color,xlocation, ylocation) {
@@ -358,6 +439,38 @@
 			
 			//console.log("x: " + x + "  y: " + y);
 			board[y - 1][x - 1] = i;
+        }
+
+        function showAvailableJumps() {
+            for(i = 0; i < availableJumps.length ; i++){
+                var className = ".column" + ((availableJumps[i][0])+1) + ".row" + ((availableJumps[i][1])+1);
+                $(className).attr("src","jumpHere.png");
+            }
+        }
+
+        function hideAvailableJumps() {
+            for(y=0; y < board.length; y++)
+            {
+                row = board[y];
+                for(x=0; x < row.length; x++)
+                {
+                    if(board[y][x]==0) {
+                        var className = ".column" + (x+1) + ".row" + (y+1);
+                        $(className).attr("src","");
+                    }
+                }
+            }
+        }
+
+        function saveBoard() {
+            if(lastSixBoards.length > 5){
+                lastSixBoards.splice(0,1);
+            }
+            lastSixBoards.push(board);
+        }
+
+        function checkForThreeRepeatedMoveDraw() {
+            // TODO: Add check
         }
 
         mirrorBoard(board);
