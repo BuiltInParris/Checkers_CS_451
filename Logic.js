@@ -332,6 +332,7 @@
         //checker_1 = new Piece("white", 2, 2);
 
         socket.on('board', function(board){
+            $("#turn").html(getYourTurn());
             console.log("Recieved new board");
 			mirrorBoard(board);
 			turnPlayer = !turnPlayer;
@@ -354,6 +355,7 @@
 		socket.on("White", function()
 		{
 			playerColor = "White";
+            $("#turn").html(getYourTurn());
 			console.log(playerColor);
 			turnPlayer = true;
 		});
@@ -361,6 +363,7 @@
 		socket.on("Black", function()
 		{
 			playerColor = "Black";
+            $("#turn").html(getOtherTurn());
 			console.log("Black player");
 		});
 		
@@ -479,5 +482,19 @@
     function SendBoard()
     {
 		console.log("Sending board");
+        $("#turn").html(getOtherTurn());
         socket.emit('move', board);
+    }
+
+    function getYourTurn(){
+        if(playerColor=="Black"){
+            return "Your Turn (Black)";
+        }
+        return "Your Turn (Red)";
+    }
+    function getOtherTurn(){
+        if(playerColor=="Black"){
+            return "Other Player's Turn (Red)";
+        }
+        return "Other Player's Turn (Black)";
     }
