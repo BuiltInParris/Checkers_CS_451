@@ -1,0 +1,10 @@
+Release Notes
+--------------
+
+Checkers v1.0
+
+This is the first release of checkers. It includes a fully functional game of checkers able to be played peer to peer on a local network. It establishes players using sockets, and only works with two players, no more. Any additional users are kicked off the server. 
+
+Future versions will include a better GUI and other options. This is under the creative commons copyright license. We hereby release the right for users to use the application in any they would like. If hosted on a server, the application will function over any distance. At the time of release, hosting was a consideration not considered by the development team due to the price of aforementioned hosting. We would also like to extend the ability of the application to handle sessions so more than two people can play at any point in time. With these limits in mind we encourage you to try out this beta application.
+
+Copyright © The Rejected Sealions. All right unreserved.

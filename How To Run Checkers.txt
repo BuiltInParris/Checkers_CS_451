@@ -1,0 +1,20 @@
+How To Run Checkers
+-------------------
+
+
+Required Applications:
+Node JS, A Web Browser.
+
+In order to install Node JS, go to https://nodejs.org/en/.
+
+Once you have Node installed properly you should be able to run Node from the command line using:
+
+cd [PATH TO FOLDER WITH FILES]
+npm install
+node app.js
+	
+
+You can then navigate to http://localhost:8080/ to see the application.
+In order for a peer on a different laptop play, they must connect to your ipv4 address on the port 8080.
+
+You can also open two separate web browsers and navigate to the url to see a game played out.
