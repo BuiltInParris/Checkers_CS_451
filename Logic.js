@@ -2,7 +2,7 @@
 	var playerColor = "";
 	var turnPlayer = false;
 	var chainJumpFlag = false; //set to true after a jump is madeif another jump can be made
-    
+
 	/* // End Game Take Piece
     var board = [[0, 0, 0, 0, 0, 0, 0, 0], 
                  [0, 1, 0, 0, 0, 0, 0, 0], 
@@ -13,17 +13,17 @@
                  [0, 0, 0, 0, 0, 0, 0, 0], 
                  [0, 0, 0, 0, 0, 0, 0, 0]];*/
 
-    /*// End Game No Moves
-    var board = [[1, 0, 1, 0, 0, 0, 0, 0], 
-                 [0, 2, 0, 0, 0, 0, 0, 0], 
-                 [0, 0, 2, 0, 2, 0, 0, 0], 
+    // End Game No Moves
+    var board = [[0, 0, 0, 0, 0, 0, 4, 0], 
                  [0, 0, 0, 0, 0, 0, 0, 0], 
                  [0, 0, 0, 0, 0, 0, 0, 0], 
                  [0, 0, 0, 0, 0, 0, 0, 0], 
-                 [0, 0, 0, 0, 0, 0, 0, 0], 
-                 [0, 0, 0, 0, 0, 0, 0, 0]];*/
+                 [0, 0, 0, 0, 0, 0, 4, 0], 
+                 [0, 3, 0, 0, 0, 0, 0, 0], 
+                 [0, 0, 0, 0, 4, 0, 0, 0], 
+                 [0, 0, 0, 3, 0, 0, 0, 0]];
 
-
+/*
     var board = [[1, 0, 1, 0, 1, 0, 1, 0], 
                  [0, 1, 0, 1, 0, 1, 0, 1], 
                  [1, 0, 1, 0, 1, 0, 1, 0], 
@@ -31,7 +31,7 @@
                  [0, 0, 0, 0, 0, 0, 0, 0], 
                  [0, 2, 0, 2, 0, 2, 0, 2], 
                  [2, 0, 2, 0, 2, 0, 2, 0], 
-                 [0, 2, 0, 2, 0, 2, 0, 2]];
+                 [0, 2, 0, 2, 0, 2, 0, 2]];*/
 
     var oldChecker = null;
     var availableJumps = [];
@@ -42,7 +42,7 @@
 
         function MovePiece(pieceColor, xOldLocation, yOldLocation, xNewLocation, yNewLocation)
         {
-            console.log(pieceColor);
+            //console.log(pieceColor);
             if(pieceColor == "black_checker.png")
             {
                 pieceColor = 2;
@@ -70,11 +70,11 @@
 				//Check if a piece should be crowned
 				if((pieceColor == 2) && (yNewLocation == 1)){
                     pieceColor = 4;
-					console.log("BECAME KING");
+					//console.log("BECAME KING");
 					ModifySpace(xNewLocation, yNewLocation, 4);
 				} else if((pieceColor == 1)&&(yNewLocation == 8)) {
                     pieceColor = 3;
-					console.log("BECAME KING");
+					//console.log("BECAME KING");
 					ModifySpace(xNewLocation, yNewLocation, 3);
 				} else {
 					ModifySpace(xNewLocation, yNewLocation, pieceColor);
@@ -98,10 +98,13 @@
 					// Once you have those coordinates, present user with the choices (however you want to do that).
 				} else {
                     saveBoard();
-                    checkForThreeRepeatedMoveDraw();
+                    if(checkForThreeRepeatedMoveDraw())
+                    {
+                        //socket.emit('end_game', false);
+                        //window.location.href = "/Draw";
+                    }
                     SendBoard();
                     turnPlayer = !turnPlayer;
-                    //checkWinner();
                 }
 			}
 
@@ -111,18 +114,23 @@
                 ModifySpace(xOldLocation, yOldLocation, 0);
 				//Check if a piece should be crowned
 				if((pieceColor == 2) && (yNewLocation == 1)){
-					console.log("BECAME KING");
+					//console.log("BECAME KING");
 					ModifySpace(xNewLocation, yNewLocation, 4);
 				} else if((pieceColor == 1)&&(yNewLocation == 8)) {
-					console.log("BECAME KING");
+					//console.log("BECAME KING");
 					ModifySpace(xNewLocation, yNewLocation, 3);
 				} else {
 					ModifySpace(xNewLocation, yNewLocation, pieceColor);
 				}
+                saveBoard();
+                if(checkForThreeRepeatedMoveDraw())
+                {
+                    socket.emit('end_game', false);
+                    window.location.href = "/Draw";
+                }
 				SendBoard();
 				turnPlayer = !turnPlayer;
-				//checkWinner();
-				//console.log(turnPlayer);
+				////console.log(turnPlayer);
             }
         }
 		
@@ -130,7 +138,7 @@
 
         function checkMoveValid(pieceColor, xOldLocation, yOldLocation, xNewLocation, yNewLocation)
         {
-			console.log(pieceColor);
+			//console.log(pieceColor);
 			/*Check if white is making a valid move */
 			var whiteCondition = ((playerColor == "White") && ((Math.abs(xOldLocation - xNewLocation) == 1 && (yOldLocation - yNewLocation == -1)) || (pieceColor == 3 && Math.abs(xOldLocation - xNewLocation) == 1 && Math.abs(yOldLocation - yNewLocation) == 1)));
 			/*Check if black is making a valid move*/
@@ -140,10 +148,10 @@
             {
                 var className = ".column" + xNewLocation + ".row" + yNewLocation;
                 
-                //console.log($(className).attr('src'));
+                ////console.log($(className).attr('src'));
                 if($(className).attr('src') == "")
                 {
-                    console.log("valid src");
+                    //console.log("valid src");
                     return true;
                 }
             }
@@ -154,7 +162,7 @@
 		/*Jump check for man piece*/
 		function checkJumpMoveValid(pieceColor, xOldLocation, yOldLocation, xNewLocation, yNewLocation)
 		{
-			console.log(pieceColor);
+			//console.log(pieceColor);
 			/*Check if white is making a valid move */
 			var whiteCondition = ((playerColor == "White") && ((Math.abs(xOldLocation - xNewLocation) == 2 && (yOldLocation - yNewLocation == -2)) || (pieceColor == 3 && Math.abs(xOldLocation - xNewLocation) == 2 && Math.abs(yOldLocation - yNewLocation) == 2)));
 			/*Check if black is making a valid move*/
@@ -171,11 +179,11 @@
 				var whiteCap = (($(remClassName).attr('src') == "black_checker.png" || $(remClassName).attr('src') == "black_king.png") && whiteCondition);
 				var blackCap = (($(remClassName).attr('src') == "white_checker.png" || $(remClassName).attr('src') == "white_king.png") && blackCondition);
                 
-				//console.log($(className).attr('src'));
+				////console.log($(className).attr('src'));
 				/*Make sure the space going to is blank*/
                 if(($(className).attr('src') == "" && whiteCap) || ($(className).attr('src') == "" && blackCap))
                 {
-                    console.log("valid src");
+                    //console.log("valid src");
                     return true;
                 }
             }
@@ -268,21 +276,21 @@
                     {
                     	if((board[y][x] == 1 && (availableCheckerMove(x,y) || availableCheckerJump(x,y))) || (board[y][x] == 3 && (availableKingMove(x,y) || availableKingJump(x,y))))
                         {
-                            console.log("TRUE AT: (" + x + ", " + y + ") = " + board[y][x]);
+                            //console.log("TRUE AT: (" + x + ", " + y + ") = " + board[y][x]);
                             return true;
                         }
                     } else if (playerColor = "Black") {
-                    	console.log("Checker move available: " + availableCheckerMove(x,y) + " - Checker jump available: " + availableCheckerJump(x,y));
+                    	//console.log("Checker move available: " + availableCheckerMove(x,y) + " - Checker jump available: " + availableCheckerJump(x,y));
                         if((board[y][x] == 2 && (availableCheckerMove(x,y) || availableCheckerJump(x,y))) || (board[y][x] == 4 && (availableKingMove(x,y) || availableKingJump(x,y))))
                         {
-                            console.log("TRUE AT: (" + x + ", " + y + ") = " + board[y][x]);
+                            //console.log("TRUE AT: (" + x + ", " + y + ") = " + board[y][x]);
                             return true;
                         }
                     }
                 }
             }
 
-            console.log("FALSE OH GEEZ.");
+            //console.log("FALSE OH GEEZ.");
             return false;
         }
 
@@ -331,12 +339,13 @@
 
         //checker_1 = new Piece("white", 2, 2);
 
-        socket.on('board', function(board){
+        socket.on('board', function(new_board){
             $("#turn").html(getYourTurn());
-            console.log("Recieved new board");
-			mirrorBoard(board);
+            //console.log("Recieved new board");
+            board = new_board;
+			mirrorBoard(new_board);
 			turnPlayer = !turnPlayer;
-			console.log("Now Turn");
+			//console.log("Now Turn");
 			if(!checkAvailableMove())
 			{
 				socket.emit('end_game', true);
@@ -348,6 +357,10 @@
 			window.location.href = "/Winner";
         });
 
+        socket.on('game_draw', function(val){
+            window.location.href = "/Draw";
+        });
+
         socket.on('disconnect', function(){
             alert("Disconnected!");
         });
@@ -356,7 +369,7 @@
 		{
 			playerColor = "White";
             $("#turn").html(getYourTurn());
-			console.log(playerColor);
+			//console.log(playerColor);
 			turnPlayer = true;
 		});
 		
@@ -364,7 +377,7 @@
 		{
 			playerColor = "Black";
             $("#turn").html(getOtherTurn());
-			console.log("Black player");
+			//console.log("Black player");
 		});
 		
         function mirrorBoard(new_board){
@@ -379,46 +392,21 @@
             }
         }
 		
-		function announceWinner(color) {
-			alert(color + "Won!");
-		}
-		function checkWinner() {
-			var numWhite = 0; // Number of white pieces left
-			var numBlack = 0; // Number of black pieces left
-			for(i=0; i < board.length; i++)
-			{
-				row = board[i];
-				for(j=0; j < row.length; j++)
-				{
-					if(row[j] == 1)
-						numWhite++;
-					else if(row[j] == 2)
-						numBlack++;
-				}
-			}
-			//console.log(numBlack);
-			//console.log(numWhite);
-			if(numBlack == 0)
-				announceWinner("white");
-			else if(numWhite == 0)
-				announceWinner("black");
-		}
-		
 		//Click on a black square
         $( ".black" ).click(function() {
             if(oldChecker != null)
             {
-            	console.log(oldChecker);
+            	//console.log(oldChecker);
                 var rowNum = $(this).find("img").attr('class').split(' ')[1][3];
                 var colNum = $(this).find("img").attr('class').split(' ')[2][6];
                 MovePiece(oldChecker[2], oldChecker[0], oldChecker[1], colNum, rowNum);
             }
-			//console.log(playerColor);
+			////console.log(playerColor);
 
             if(turnPlayer &&((playerColor == "White" &&($(this).find("img").attr('src') == "white_checker.png" ||$(this).find("img").attr('src') == "white_king.png")) ||(playerColor == "Black" &&($(this).find("img").attr('src') == "black_checker.png" ||$(this).find("img").attr('src') == "black_king.png"))))
             {
                 oldChecker = [$(this).find("img").attr('class').split(' ')[2][6], $(this).find("img").attr('class').split(' ')[1][3], $(this).find("img").attr('src')];
-                //console.log($(this).find("img").attr('src'));
+                ////console.log($(this).find("img").attr('src'));
             } else {
                 oldChecker = null;
             }
@@ -440,7 +428,7 @@
                 $(className).attr("src","black_king.png");
             }
 			
-			//console.log("x: " + x + "  y: " + y);
+			////console.log("x: " + x + "  y: " + y);
 			board[y - 1][x - 1] = i;
         }
 
@@ -472,8 +460,35 @@
             lastSixBoards.push(board);
         }
 
+        function arraysEqual(arr1, arr2) {
+            if(arr1.length !== arr2.length)
+                return false;
+            for(var i = arr1.length; i--;) {
+                if(arr1[i] !== arr2[i])
+                    return false;
+            }
+            return true;
+        }
+
         function checkForThreeRepeatedMoveDraw() {
             // TODO: Add check
+            if(lastSixBoards.length == 6)
+            {
+                for(var i = 0; i < board.length; i++)
+                {
+                    //console.log(lastSixBoards);
+                    if(!arraysEqual(lastSixBoards[0][i], lastSixBoards[2][i]) || !arraysEqual(lastSixBoards[0][i], lastSixBoards[4][i]))
+                    {
+                        return false;
+                        
+                    } else if(!arraysEqual(lastSixBoards[1][i], lastSixBoards[3][i]) || !arraysEqual(lastSixBoards[1][i], lastSixBoards[5][i]))
+                    {
+                        return false;
+                    }
+                }
+                //console.log(lastSixBoards);
+                return true;
+            }
         }
 
         mirrorBoard(board);
@@ -481,7 +496,7 @@
 
     function SendBoard()
     {
-		console.log("Sending board");
+		//console.log("Sending board");
         $("#turn").html(getOtherTurn());
         socket.emit('move', board);
     }

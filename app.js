@@ -70,12 +70,17 @@ var server = http.createServer( function(req, res) {
 		filename = "/loser.html";
 	}
 
+	if(filename == "/Draw")
+	{
+		filename = "/draw.html";
+	}
+
 	if(filename != "/socket.io/")
 	{
-		//console.log(filename);
+		////console.log(filename);
 		var exts = filename.split('.');
 		var ext = exts[exts.length - 1];
-		//console.log("AARGH: " + ext)
+		////console.log("AARGH: " + ext)
 
 		var localPath = __dirname;
 
@@ -86,23 +91,23 @@ var server = http.createServer( function(req, res) {
 			localPath += filename;
 			fs.exists(localPath, function(exists) {
 				if(exists) {
-					//console.log("Serving file: " + localPath);
+					////console.log("Serving file: " + localPath);
 					getFile(localPath, res, ext);
 				} else {
-					console.log("File not found: " + localPath);
+					//console.log("File not found: " + localPath);
 					res.writeHead(404);
 					res.end();
 				}
 			});
 
 		} else {
-			console.log("Invalid file extension detected: " + ext);
+			//console.log("Invalid file extension detected: " + ext);
 		}
 	}
 });
 
 server.listen(port, function() {
-  console.log('Server working at http://localhost:' + port);
+  //console.log('Server working at http://localhost:' + port);
 });
 
 var socket = io.listen(server); 
@@ -127,20 +132,26 @@ socket.on('connection', function(client){
   
   
   
-  console.log('A NEW CHALLENGER HAS ARISEN. Num players: ' + numPlayers);
+  //console.log('A NEW CHALLENGER HAS ARISEN. Num players: ' + numPlayers);
   if(numPlayers > 2)
   {
   	numPlayers = numPlayers - 1;
   	client.disconnect();
   }
 	client.on('move', function(board){
-		console.log(board);
+		//console.log(board);
 		client.broadcast.emit('board', board);
 	});
 
 	client.on('end_game', function(val){
-		console.log("Game over!");
-		client.broadcast.emit('game_over');
+		if(val)
+		{
+			//console.log("Game over!");
+			client.broadcast.emit('game_over');
+		} else {
+			//console.log("Game draw!");
+			client.broadcast.emit('game_draw');
+		}
 	});
 
 	client.on('disconnect', function() {
@@ -153,7 +164,7 @@ socket.on('connection', function(client){
 			black = false;
 		}
 		numPlayers = numPlayers - 1;
-        console.log('socket '+this.id+' disconnect');
+        //console.log('socket '+this.id+' disconnect');
     });
 });
 
